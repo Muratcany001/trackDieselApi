@@ -1,0 +1,6 @@
+@BarMenu_HostAddress = http://localhost:5077
+
+GET {{BarMenu_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
