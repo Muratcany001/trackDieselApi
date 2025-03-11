@@ -7,13 +7,13 @@ namespace BarMenu.Controller
     [ApiController]
     public class MenuController : ControllerBase
     {
-        private readonly IMenuRepository _menuRepository;
-        public MenuController(IMenuRepository menuRepository)
+        private readonly ICarRepository _menuRepository;
+        public MenuController(ICarRepository menuRepository)
         {
             _menuRepository = menuRepository;
         }
         [HttpPost("menus/AddMenu")]
-        public ActionResult<Menu> AddMenu(Menu menu)
+        public ActionResult<Car> AddMenu(Car menu)
         {
             {
                 if (menu == null)
@@ -25,13 +25,13 @@ namespace BarMenu.Controller
             }
         }
         [HttpGet("menus/GetAll")]
-        public ActionResult<Menu>  GetAllMenu() {
+        public ActionResult<Car>  GetAllMenu() {
 
             var users = _menuRepository.GetAllMenus();
             return Ok(users);
         }
         [HttpGet("menus/GetMenuByCategory/{category}")]
-        public ActionResult<Menu> GetMenuByCategory(string category) { 
+        public ActionResult<Car> GetMenuByCategory(string category) { 
             var MenuCategory = _menuRepository.GetMenusByCategory(category);
             if (MenuCategory == null)
             {
@@ -40,7 +40,7 @@ namespace BarMenu.Controller
             return Ok(MenuCategory);
         }
         [HttpPatch("menus/UpdateMenu}")]
-        public ActionResult<Menu> UpdateMenu(int id, [FromBody] Menu updateMenu) { 
+        public ActionResult<Car> UpdateMenu(int id, [FromBody] Car updateMenu) { 
             var existingMenu = _menuRepository.GetMenuById(id);
             if (existingMenu == null)
             {
