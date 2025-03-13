@@ -47,6 +47,10 @@ namespace BarMenu.Concrete
         {
             return _context.Users.ToList();
         }
+        public async Task<User> GetUserByName(string name)
+        {
+            return await _context.Users.FirstOrDefaultAsync(x=>x.Name == name);
+        }
 
     }
 }

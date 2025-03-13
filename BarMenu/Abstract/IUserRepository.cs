@@ -9,5 +9,6 @@ namespace BarMenu.Abstract
         User UpdateUser(int id, User user);
         User GetUserById(int id);
         User DeleteUser(int id);
+        User GetUserByName(string name);
     }
 }
