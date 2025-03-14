@@ -22,7 +22,7 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult> Login([FromBody] User loginUser)
     {
-        var user = await _userRepository.GetUserByUsername(loginUser.Username);
+        var user = await _userRepository.GetUserByName(loginUser.Name);
 
         if (user == null || user.Password != loginUser.Password)
         {
@@ -38,7 +38,7 @@ public class AuthController : ControllerBase
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Name, user.Name),
             new Claim(ClaimTypes.Role, "User")
         };
 
