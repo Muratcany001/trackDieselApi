@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using trackDieselApi.Entities.AppEntities;
 
 namespace BarMenu.Entities.AppEntities
 {
@@ -8,12 +9,12 @@ namespace BarMenu.Entities.AppEntities
         public int Id { get; set; }
         public string Name { get; set; }
         public string Model { get; set; }
+        public int Age { get; set; }
         public string Plate { get; set; }
         public string EngineType { get; set; }
-        public string ErrorHistory { get; set; }
+        public List<Issue> ErrorHistory { get; set; }
         public DateTime LastMaintenanceDate { get; set; }
-        public string ErrorDescription { get; set; }
         public string PartsReplaced { get; set; }
-        public int Age { get; set; }
+        
     }
 }

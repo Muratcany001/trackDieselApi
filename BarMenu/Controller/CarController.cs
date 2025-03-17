@@ -52,7 +52,6 @@ namespace BarMenu.Controller
             existingCar.EngineType = updateCar.EngineType ?? existingCar.EngineType;  // EngineType varsa güncellenir
             existingCar.ErrorHistory = updateCar.ErrorHistory ?? existingCar.ErrorHistory;  // ErrorHistory varsa güncellenir
             existingCar.LastMaintenanceDate = updateCar.LastMaintenanceDate == default(DateTime) ? existingCar.LastMaintenanceDate : updateCar.LastMaintenanceDate;  // LastMaintenanceDate varsa güncellenir
-            existingCar.ErrorDescription = updateCar.ErrorDescription ?? existingCar.ErrorDescription;  // ErrorDescription varsa güncellenir
             existingCar.PartsReplaced = updateCar.PartsReplaced ?? existingCar.PartsReplaced;  // PartsReplaced varsa güncellenir
             existingCar.Age = updateCar.Age != 0 ? updateCar.Age : existingCar.Age;
 
@@ -80,5 +79,18 @@ namespace BarMenu.Controller
             var carCount = await _carRepository.GetCarCountAsync();
             return Ok(carCount);
         }
+        [HttpGet("GetAllCarsWithParts")]
+        public async Task<IActionResult> GetAllCarsWithParts()
+        {
+            var carsWithParts = await _carRepository.GetCarsWithPartNames();
+
+            if (carsWithParts == null || !carsWithParts.Any())
+            {
+                return NotFound("Araç veya arızalı parça bulunamadı.");
+            }
+
+            return Ok(carsWithParts);  // JSON formatında tüm araçları ve arızalı parçaları döndürüyoruz
+        }
+
     }
 }
