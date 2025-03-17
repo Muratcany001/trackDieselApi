@@ -4,6 +4,7 @@ using BarMenu.Entities.AppEntities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using trackDieselApi.Entities.AppEntities;
 
 namespace BarMenu.Concrete
 {
@@ -30,6 +31,37 @@ namespace BarMenu.Concrete
             return await menu;
 
         }
+        public async Task<List<Car>> GetCarsWithPartNames()
+        {
+            var carsWithIssues = await _context.Cars
+                .Where(car => car.ErrorHistory.Any())  // Arızalı parçası olan araçları filtreliyoruz
+                .Select(car => new
+                {
+                    car.Name,
+                    car.Model,
+                    car.Age,
+                    Issues = car.ErrorHistory.Select(issue => new
+                    {
+                        issue.PartName  // Sadece PartName alıyoruz
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            // Veriyi dönüşümünü yapıyoruz
+            var result = carsWithIssues.Select(car => new Car
+            {
+                Name = car.Name,
+                Model = car.Model,
+                Age = car.Age,
+                ErrorHistory = car.Issues.Select(issue => new Issue
+                {
+                    PartName = issue.PartName  // Arızalı parçaların adlarını ErrorHistory'ye ekliyoruz
+                }).ToList()
+            }).ToList();
+
+            return result;
+        }
+
         public async Task<Car> UpdateCar(Car car)
         {
             var existingCar = _context.Cars.FirstOrDefault(m => m.Id == car.Id);
@@ -39,7 +71,6 @@ namespace BarMenu.Concrete
             existingCar.Id = car.Id;
             existingCar.Name = car.Name;
             existingCar.ErrorHistory = car.ErrorHistory;
-            existingCar.ErrorDescription = car.ErrorDescription;
             existingCar.LastMaintenanceDate = car.LastMaintenanceDate;
             existingCar.PartsReplaced = car.PartsReplaced;
             existingCar.Plate = car.Plate;
