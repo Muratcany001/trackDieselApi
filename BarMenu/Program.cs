@@ -1,3 +1,5 @@
+using BarMenu.Entities; // DbContext'lerin bulunduðu namespace
+using Microsoft.EntityFrameworkCore;
 
 namespace BarMenu
 {
@@ -10,9 +12,25 @@ namespace BarMenu
             // Add services to the container.
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            // Add CORS configuration
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin", builder =>
+                {
+                    builder.WithOrigins("http://localhost:4200") // Frontend URL
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
+
+            // Add Swagger/OpenAPI configuration
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            // Add DbContext
+            builder.Services.AddDbContext<Context>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 
@@ -23,10 +41,12 @@ namespace BarMenu
                 app.UseSwaggerUI();
             }
 
+            // Enable CORS
+            app.UseCors("AllowSpecificOrigin");
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

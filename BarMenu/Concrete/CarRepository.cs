@@ -31,6 +31,13 @@ namespace BarMenu.Concrete
             return await menu;
 
         }
+        public async Task<Car> GetCarWithIssuesAsync(int carId)
+        {
+            return await _context.Cars
+                .Where(car => car.Id == carId)
+                .Include(car => car.ErrorHistory) 
+                .FirstOrDefaultAsync();
+        }
         public async Task<List<Car>> GetCarsWithPartNames()
         {
             var carsWithIssues = await _context.Cars
