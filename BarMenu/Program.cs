@@ -1,5 +1,8 @@
+using BarMenu.Abstract;
+using BarMenu.Concrete;
 using BarMenu.Entities; // DbContext'lerin bulunduðu namespace
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace BarMenu
 {
@@ -23,6 +26,15 @@ namespace BarMenu
                            .AllowAnyHeader();
                 });
             });
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+            });
+            builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Döngüsel referanslarý ignore et
+    });
 
             // Add Swagger/OpenAPI configuration
             builder.Services.AddEndpointsApiExplorer();
@@ -31,6 +43,10 @@ namespace BarMenu
             // Add DbContext
             builder.Services.AddDbContext<Context>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            // Add scoped services here before calling 'Build()'
+            builder.Services.AddScoped<ICarRepository, CarRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
 
             var app = builder.Build();
 

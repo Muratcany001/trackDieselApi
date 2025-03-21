@@ -13,35 +13,38 @@ namespace BarMenu.Controller
             _carRepository = carRepository;
         }
         [HttpPost("cars/AddCar")]
-        public ActionResult<Car> AddMenu(Car car)
-        {
-            {
+        public IActionResult AddCar(Car car)
+        {    
                 if (car == null)
                 {
-                    return BadRequest("Geçersiz menü verisi");
+                return BadRequest("Lütfen araç bilgilerini doldur...");
                 }
-                var AddCar = _carRepository.AddCar(car);
-                return CreatedAtAction(nameof(AddCar), AddCar);
+            foreach (var issue in car.ErrorHistory)
+            {
+                issue.Id = 0;
+                issue.Car = null;
             }
+
+            var AddCar = _carRepository.AddCar(car);
+            return Ok(AddCar);
         }
         [HttpGet("cars/GetAll")]
-        public ActionResult<Car>  GetAllCar() {
-
-            var cars = _carRepository.GetAllCars();
+        public async Task<ActionResult<List<Car>>>  GetAllCar() {
+            var cars = await _carRepository.GetAllCars();
             return Ok(cars);
         }
         [HttpGet("cars/GetCarByPlate/{plate}")]
-        public ActionResult<Car> GetCarByPlate(string plate) { 
-            var car = _carRepository.GetCarByPlate(plate);
+        public async Task<ActionResult<Car>> GetCarByPlate(string plate) { 
+            var car = await _carRepository.GetCarByPlate(plate);
             if (car == null)
             {
                 return NotFound("Araç bulunamadı");
             }
             return Ok(car);
         }
-        [HttpPatch("cars/UpdateCar/{id}")]
-        public async Task<ActionResult<Car>> UpdateMenu(int id, [FromBody] Car updateCar) { 
-            var existingCar = await _carRepository.GetCarById(id);
+        [HttpPatch("cars/UpdateCar/{plate}")]
+        public async Task<ActionResult<Car>> UpdateMenu(string plate, [FromBody] Car updateCar) {
+            var existingCar = await _carRepository.GetCarByPlate(plate);
             if (existingCar == null)
             {
                 return NotFound("Menü bulunamadı");
@@ -52,7 +55,6 @@ namespace BarMenu.Controller
             existingCar.EngineType = updateCar.EngineType ?? existingCar.EngineType;  // EngineType varsa güncellenir
             existingCar.ErrorHistory = updateCar.ErrorHistory ?? existingCar.ErrorHistory;  // ErrorHistory varsa güncellenir
             existingCar.LastMaintenanceDate = updateCar.LastMaintenanceDate == default(DateTime) ? existingCar.LastMaintenanceDate : updateCar.LastMaintenanceDate;  // LastMaintenanceDate varsa güncellenir
-            existingCar.PartsReplaced = updateCar.PartsReplaced ?? existingCar.PartsReplaced;  // PartsReplaced varsa güncellenir
             existingCar.Age = updateCar.Age != 0 ? updateCar.Age : existingCar.Age;
 
             _carRepository.UpdateCar(existingCar);

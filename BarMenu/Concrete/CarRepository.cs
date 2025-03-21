@@ -4,7 +4,6 @@ using BarMenu.Entities.AppEntities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using trackDieselApi.Entities.AppEntities;
 
 namespace BarMenu.Concrete
 {
@@ -15,10 +14,14 @@ namespace BarMenu.Concrete
         _context = context;
         }
 
-       public async Task<Car> AddCar(Car car)
+       public Car AddCar(Car car)
         {
+            foreach (var issue in car.ErrorHistory) {
+                issue.Car = null;
+                issue.CarId = 0;
+            }
             _context.Cars.Add(car);
-            _context.SaveChangesAsync();
+            _context.SaveChanges();
             return car;
         }
         public async Task<List<Car>> GetAllCars()
@@ -41,7 +44,7 @@ namespace BarMenu.Concrete
         public async Task<List<Car>> GetCarsWithPartNames()
         {
             var carsWithIssues = await _context.Cars
-                .Where(car => car.ErrorHistory.Any())  // Arızalı parçası olan araçları filtreliyoruz
+                .Where(car => car.ErrorHistory.Any()) // Arızalı parçası olan araçları filtreliyoruz
                 .Select(car => new
                 {
                     car.Name,
@@ -49,7 +52,9 @@ namespace BarMenu.Concrete
                     car.Age,
                     Issues = car.ErrorHistory.Select(issue => new
                     {
-                        issue.PartName  // Sadece PartName alıyoruz
+                        issue.PartName,  // Sadece PartName alıyoruz
+                        issue.DateReported,
+                        issue.IsReplaced
                     }).ToList()
                 })
                 .ToListAsync();
@@ -62,13 +67,14 @@ namespace BarMenu.Concrete
                 Age = car.Age,
                 ErrorHistory = car.Issues.Select(issue => new Issue
                 {
-                    PartName = issue.PartName  // Arızalı parçaların adlarını ErrorHistory'ye ekliyoruz
+                    PartName = issue.PartName,  // Arızalı parçaların adlarını ErrorHistory'ye ekliyoruz
+                    DateReported = issue.DateReported,
+                    IsReplaced = issue.IsReplaced
                 }).ToList()
             }).ToList();
 
             return result;
         }
-
         public async Task<Car> UpdateCar(Car car)
         {
             var existingCar = _context.Cars.FirstOrDefault(m => m.Id == car.Id);
@@ -79,7 +85,6 @@ namespace BarMenu.Concrete
             existingCar.Name = car.Name;
             existingCar.ErrorHistory = car.ErrorHistory;
             existingCar.LastMaintenanceDate = car.LastMaintenanceDate;
-            existingCar.PartsReplaced = car.PartsReplaced;
             existingCar.Plate = car.Plate;
             _context.Cars.Update(existingCar);
             await _context.SaveChangesAsync();
