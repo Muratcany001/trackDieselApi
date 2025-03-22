@@ -9,6 +9,8 @@ public class Issue
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
+    public string? Model { get; set; }
+    public string? EngineType { get; set; }
     public string PartName { get; set; }
     public string Description { get; set; }
     public DateTime DateReported { get; set; }

@@ -41,39 +41,9 @@ namespace BarMenu.Concrete
                 .Include(car => car.ErrorHistory) 
                 .FirstOrDefaultAsync();
         }
-        public async Task<List<Car>> GetCarsWithPartNames()
+        public async Task<List<Issue>> GetAllIssues()
         {
-            var carsWithIssues = await _context.Cars
-                .Where(car => car.ErrorHistory.Any()) // Arızalı parçası olan araçları filtreliyoruz
-                .Select(car => new
-                {
-                    car.Name,
-                    car.Model,
-                    car.Age,
-                    Issues = car.ErrorHistory.Select(issue => new
-                    {
-                        issue.PartName,  // Sadece PartName alıyoruz
-                        issue.DateReported,
-                        issue.IsReplaced
-                    }).ToList()
-                })
-                .ToListAsync();
-
-            // Veriyi dönüşümünü yapıyoruz
-            var result = carsWithIssues.Select(car => new Car
-            {
-                Name = car.Name,
-                Model = car.Model,
-                Age = car.Age,
-                ErrorHistory = car.Issues.Select(issue => new Issue
-                {
-                    PartName = issue.PartName,  // Arızalı parçaların adlarını ErrorHistory'ye ekliyoruz
-                    DateReported = issue.DateReported,
-                    IsReplaced = issue.IsReplaced
-                }).ToList()
-            }).ToList();
-
-            return result;
+                return await _context.Issues.ToListAsync();
         }
         public async Task<Car> UpdateCar(Car car)
         {

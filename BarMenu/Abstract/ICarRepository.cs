@@ -12,6 +12,7 @@ namespace BarMenu.Abstract
         Task<Car> GetCarByPlate (string plate);
         Task<int> GetCarCountAsync();
         Task<Car> GetCarWithIssuesAsync(int carId);
-        Task<List<Car>> GetCarsWithPartNames();
+        //Task<List<Car>> GetCarsWithPartNames();
+        Task<List<Issue>> GetAllIssues();
     }
 }

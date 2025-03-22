@@ -50,9 +50,7 @@ namespace BarMenu.Controller
                 return NotFound("Menü bulunamadı");
             }
             existingCar.Name = updateCar.Name ?? existingCar.Name;  // Name varsa güncellenir
-            existingCar.Model = updateCar.Model ?? existingCar.Model;  // Model varsa güncellenir
             existingCar.Plate = updateCar.Plate ?? existingCar.Plate;  // Plate varsa güncellenir
-            existingCar.EngineType = updateCar.EngineType ?? existingCar.EngineType;  // EngineType varsa güncellenir
             existingCar.ErrorHistory = updateCar.ErrorHistory ?? existingCar.ErrorHistory;  // ErrorHistory varsa güncellenir
             existingCar.LastMaintenanceDate = updateCar.LastMaintenanceDate == default(DateTime) ? existingCar.LastMaintenanceDate : updateCar.LastMaintenanceDate;  // LastMaintenanceDate varsa güncellenir
             existingCar.Age = updateCar.Age != 0 ? updateCar.Age : existingCar.Age;
@@ -81,17 +79,24 @@ namespace BarMenu.Controller
             var carCount = await _carRepository.GetCarCountAsync();
             return Ok(carCount);
         }
-        [HttpGet("GetAllCarsWithParts")]
-        public async Task<IActionResult> GetAllCarsWithParts()
+        //[HttpGet("GetAllCarsWithParts")]
+        //public async Task<IActionResult> GetAllCarsWithParts()
+        //{
+        //    var carsWithParts = await _carRepository.GetCarsWithPartNames();
+
+        //    if (carsWithParts == null || !carsWithParts.Any())
+        //    {
+        //        return NotFound("Araç veya arızalı parça bulunamadı.");
+        //    }
+
+        //    return Ok(carsWithParts);  // JSON formatında tüm araçları ve arızalı parçaları döndürüyoruz
+        //}
+        [HttpGet("cars/getAllIssues")]
+        public async Task<IActionResult> GetAllIssues()
         {
-            var carsWithParts = await _carRepository.GetCarsWithPartNames();
-
-            if (carsWithParts == null || !carsWithParts.Any())
-            {
-                return NotFound("Araç veya arızalı parça bulunamadı.");
-            }
-
-            return Ok(carsWithParts);  // JSON formatında tüm araçları ve arızalı parçaları döndürüyoruz
+            var Issues = await _carRepository.GetAllIssues();
+            if (Issues == null || !Issues.Any()) { return NotFound("Kayıtlı arıza parçası bulunamadı"); }
+            return Ok(Issues);
         }
 
     }
