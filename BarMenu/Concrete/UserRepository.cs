@@ -13,10 +13,11 @@ namespace BarMenu.Concrete
             _context = context;
         }
         public User CreateUser(User user)
-        {
-           _context.Users.Add(user);
-            _context.SaveChanges();
-            return user;
+        {           
+                _context.Users.Add(user);
+                _context.SaveChanges();
+                return user;
+            
         }
         public User UpdateUser(int id, User updateUser)
         {

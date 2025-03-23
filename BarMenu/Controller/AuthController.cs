@@ -12,7 +12,8 @@ using System.Threading.Tasks;
 public class AuthController : ControllerBase
 {
     private readonly IUserRepository _userRepository;
-    private readonly string _secretKey = "your-256-bit-secret";
+    // _secretKey'i 256-bit'e çıkarıyoruz
+    private readonly string _secretKey = "your-256-bit-long-secret-key-that-you-need-to-ensure-is-256-bits-long";
 
     public AuthController(IUserRepository userRepository)
     {
@@ -42,12 +43,13 @@ public class AuthController : ControllerBase
             new Claim(ClaimTypes.Role, "User")
         };
 
+        // Şimdi, secret key'i doğru uzunlukta (256-bit) kullanıyoruz
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: "yourIssuer",
-            audience: "yourAudience",
+            issuer: "yourIssuer", // İssuer bilgisi
+            audience: "yourAudience", // Audience bilgisi
             claims: claims,
             expires: DateTime.Now.AddDays(1),
             signingCredentials: creds

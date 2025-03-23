@@ -14,17 +14,23 @@ namespace BarMenu.Controller
         }
 
         [HttpPost("users/register")]
-        public ActionResult<User> Register(User user) {
+        public ActionResult Register([FromBody] User user) {
             if (user == null)
             {
                 return BadRequest("Geçersiz kullanıcı verisi");
-                
-               
             }
-            var createdUser = _userRepository.CreateUser(user);
+            else if (user.Name != null) { 
+                return BadRequest("Kullanıcı adı zaten mevcut ");
+            }
+            var existingUser = new User { 
+                Name = user.Name,
+                Email = user.Email,
+                Password = user.Password,
+            };
+            var createdUser = _userRepository.CreateUser(existingUser);
             return CreatedAtAction(nameof(Register), createdUser);
         }
-        [HttpGet("users/{id}")]
+        [HttpGet("users/getUser/{id}")]
         public ActionResult<User> Get(int id)
         {
             if (id == null) {
@@ -50,6 +56,12 @@ namespace BarMenu.Controller
             }
             _userRepository.DeleteUser(id);
             return Ok(new {message = "Kullanıcı başarıyla silindi"});
+        }
+        [HttpGet("users/getUser")]
+        public ActionResult<User> GetUser()
+        {
+            var users = _userRepository.GetAllUsers().ToList();
+            return Ok(users);
         }
     }
 }
