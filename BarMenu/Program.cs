@@ -17,16 +17,14 @@ namespace BarMenu
             // CORS ayarlarý
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAllOrigins", builder =>
+                options.AddPolicy("AllowSpecificOrigin", builder =>
                 {
-                    builder.AllowAnyOrigin() // Tüm kaynaklardan gelen isteklere izin ver
-                           .AllowAnyMethod()  // Herhangi bir HTTP metoduna izin ver
-                           .AllowAnyHeader();  // Herhangi bir baþlýða izin ver
+                    builder.WithOrigins("http://localhost:4200") // Angular URL
+                           .AllowAnyMethod()
+                           .AllowAnyHeader()
+                           .AllowCredentials();
                 });
             });
-
-
-
 
 
             builder.Services.AddControllers().AddJsonOptions(options =>
@@ -45,10 +43,12 @@ namespace BarMenu
             // Add scoped services
             builder.Services.AddScoped<ICarRepository, CarRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+
             var app = builder.Build();
 
             // CORS'u kullan
-            app.UseCors("AllowAllOrigins");
+            app.UseCors("AllowSpecificOrigin");  // Burada sadece bir kez kullanýlmasý yeterli
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -56,9 +56,7 @@ namespace BarMenu
                 app.UseSwaggerUI();
             }
 
-            // Enable CORS for all origins
-            app.UseCors("AllowAllOrigins");
-
+            // HTTPS redirection ve authorization kullanýmý
             app.UseHttpsRedirection();
             app.UseAuthorization();
 

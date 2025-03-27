@@ -26,7 +26,7 @@ namespace BarMenu.Concrete
         }
         public async Task<List<Car>> GetAllCars()
         {
-            return await _context.Cars.ToListAsync();
+            return await _context.Cars.Include(c=> c.ErrorHistory).ToListAsync();
         }
         public async Task<Car> GetCarById(int id)
         {
