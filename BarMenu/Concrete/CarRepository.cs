@@ -30,7 +30,7 @@ namespace BarMenu.Concrete
         }
         public async Task<Car> GetCarById(int id)
         {
-            var menu = _context.Cars.FirstOrDefaultAsync(m => m.Id == id);
+            var menu = _context.Cars.Include(x => x.ErrorHistory).FirstOrDefaultAsync(m => m.Id == id);
             return await menu;
 
         }
@@ -47,7 +47,7 @@ namespace BarMenu.Concrete
         }
         public async Task<Car> UpdateCar(Car car)
         {
-            var existingCar = _context.Cars.FirstOrDefault(m => m.Id == car.Id);
+            var existingCar = _context.Cars.Include(x => x.ErrorHistory).FirstOrDefault(m => m.Id == car.Id);
             if (existingCar == null) {
                 throw new Exception("Araç bulunamadı");
             }
@@ -62,7 +62,7 @@ namespace BarMenu.Concrete
         }
         public async Task<bool> DeleteCar(int id)
         {
-            var existedCar = _context.Cars.FirstOrDefault(x => x.Id == id);
+            var existedCar = _context.Cars.Include(x=> x.ErrorHistory).FirstOrDefault(x => x.Id == id);
             if (existedCar != null)
             {
                 _context.Cars.Remove(existedCar);
@@ -81,7 +81,7 @@ namespace BarMenu.Concrete
         }
         public async Task<Car> GetCarByPlate(string plate)
         {
-            var existedCar = await _context.Cars.FirstOrDefaultAsync(x => x.Plate == plate);
+            var existedCar = await _context.Cars.Include(x=> x.ErrorHistory).FirstOrDefaultAsync(x => x.Plate == plate);
             if (existedCar == null) {
                 throw new Exception("Belirtilen plakaya ait araç bulunamadı");
             }
