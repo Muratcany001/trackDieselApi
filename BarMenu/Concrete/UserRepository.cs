@@ -12,12 +12,11 @@ namespace BarMenu.Concrete
         {
             _context = context;
         }
-        public User CreateUser(User user)
+        public async Task<User> CreateUser(User user)
         {           
                 _context.Users.Add(user);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return user;
-            
         }
         public User UpdateUser(int id, User updateUser)
         {
@@ -50,7 +49,7 @@ namespace BarMenu.Concrete
         }
         public async Task<User> GetUserByName(string name)
         {
-            return await _context.Users.FirstOrDefaultAsync(x=>x.Name == name);
+            return await _context.Users.FirstOrDefaultAsync(x => x.Name == name);
         }
 
     }

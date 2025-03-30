@@ -12,24 +12,42 @@ namespace BarMenu.Controller
         {
             _userRepository = userRepository;
         }
+        [HttpGet("users/GetUserByName")]
+        public ActionResult<User> GetUserByName(string name)
+        {
+            var existedUser = _userRepository.GetUserByName(name);
+            if (existedUser == null)
+            {
+                return NotFound("Kullanıcı adı bulunamadı");
+            }
+            return Ok(existedUser);
+        }
 
         [HttpPost("users/register")]
-        public ActionResult Register([FromBody] User user) {
+        public async Task<ActionResult> Register([FromBody] User user)
+        {
             if (user == null)
             {
                 return BadRequest("Geçersiz kullanıcı verisi");
             }
-            else if (user.Name != null) { 
-                return BadRequest("Kullanıcı adı zaten mevcut ");
+            if (string.IsNullOrEmpty(user.Name))
+            {
+                return BadRequest("Kullanıcı adı boş olamaz");
             }
-            var existingUser = new User { 
-                Name = user.Name,
-                Email = user.Email,
-                Password = user.Password,
-            };
-            var createdUser = _userRepository.CreateUser(existingUser);
-            return CreatedAtAction(nameof(Register), createdUser);
+            if (string.IsNullOrEmpty(user.Password))
+            {
+                return BadRequest("Şifre boş olamaz");
+            }
+            var existedUser = await _userRepository.GetUserByName(user.Name);
+            if (existedUser != null)
+            {
+                return BadRequest("Kullanıcı adı zaten mevcut");
+            }
+            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+            var createdUser = await _userRepository.CreateUser(user);
+            return CreatedAtAction(nameof(GetUserByName), new { name = createdUser.Name }, createdUser);
         }
+
         [HttpGet("users/getUser/{id}")]
         public ActionResult<User> Get(int id)
         {

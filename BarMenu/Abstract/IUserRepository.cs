@@ -4,7 +4,7 @@ namespace BarMenu.Abstract
 {
     public interface IUserRepository
     {
-        User CreateUser(User user);
+        Task<User> CreateUser(User user);
         List<User> GetAllUsers();
         User UpdateUser(int id, User user);
         User GetUserById(int id);
