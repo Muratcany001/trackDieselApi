@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 [Route("api/auth")]
 [ApiController]
@@ -25,15 +26,28 @@ public class AuthController : ControllerBase
     {
         var user = await _userRepository.GetUserByName(loginUser.Name);
 
-        if (user == null || user.Password != loginUser.Password)
+        // Kullanıcı bulunamazsa ya da şifre uyuşmazsa hata döndürüyoruz
+        if (user == null || HashPasswordSHA256(loginUser.Password) != user.Password)
         {
             return Unauthorized("Geçersiz kullanıcı adı veya şifre");
         }
 
+        // JWT token oluşturma
         var token = GenerateJwtToken(user);
 
         return Ok(new { token });
     }
+
+    private string HashPasswordSHA256(string password)
+    {
+        using (var sha256 = SHA256.Create())
+        {
+            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+            byte[] hashBytes = sha256.ComputeHash(passwordBytes);
+            return Convert.ToBase64String(hashBytes);
+        }
+    }
+
 
     private string GenerateJwtToken(User user)
     {

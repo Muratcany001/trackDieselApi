@@ -1,6 +1,8 @@
 ﻿using BarMenu.Abstract;
 using BarMenu.Entities.AppEntities;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace BarMenu.Controller
 {
@@ -43,9 +45,27 @@ namespace BarMenu.Controller
             {
                 return BadRequest("Kullanıcı adı zaten mevcut");
             }
-            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+
+            // Şifreyi SHA256 ile hash'leme
+            user.Password = HashPasswordSHA256(user.Password);
+
             var createdUser = await _userRepository.CreateUser(user);
             return CreatedAtAction(nameof(GetUserByName), new { name = createdUser.Name }, createdUser);
+        }
+
+        private string HashPasswordSHA256(string password)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                // Şifreyi byte dizisine çeviriyoruz
+                byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+
+                // Hash'li şifreyi oluşturuyoruz
+                byte[] hashBytes = sha256.ComputeHash(passwordBytes);
+
+                // Hash'li şifreyi Base64 string olarak geri döndürüyoruz
+                return Convert.ToBase64String(hashBytes);
+            }
         }
 
         [HttpGet("users/getUser/{id}")]
