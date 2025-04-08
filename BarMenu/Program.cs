@@ -43,6 +43,7 @@ namespace BarMenu
             // Add scoped services
             builder.Services.AddScoped<ICarRepository, CarRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IErrorRepository, ErrorRepository>();
 
             var app = builder.Build();
 
