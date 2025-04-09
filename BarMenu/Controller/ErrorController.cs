@@ -18,11 +18,8 @@ namespace BarMenu.Controller
 
             if (existedError == null)
             {
-                // Hata kodu bulunamadıysa 404 Not Found döndürüyoruz
                 return NotFound($"Arıza kodu {errorName} bulunamadı");
             }
-
-            // Hata kodu bulunduysa, 200 OK yanıtı döndürüyoruz
             return Ok(existedError);
         }
 
@@ -30,7 +27,7 @@ namespace BarMenu.Controller
         public ActionResult AddError(Error error) { 
         
             var existedError = _errorRepository.GetErrorByName(error.Code);
-            if (existedError == null)
+            if (existedError != null)
             {
                 return Conflict("Arıza kodu zaten mevcut");
             }
