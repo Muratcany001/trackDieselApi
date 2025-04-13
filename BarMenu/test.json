@@ -1,0 +1,14 @@
+[
+  {
+    "Code": "TEST001",
+    "Description": "Test hatası 1"
+  },
+  {
+    "Code": "TEST002",
+    "Description": "Test hatası 2"
+  },
+  {
+    "Code": "TEST003",
+    "Description": "Test hatası 3"
+  }
+]

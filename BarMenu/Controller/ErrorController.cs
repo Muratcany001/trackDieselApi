@@ -11,7 +11,7 @@ namespace BarMenu.Controller
         {
             _errorRepository = errorRepository;
         }
-        [HttpGet("errors/GetErrorByName")]
+        [HttpGet("errors/GetErrorByName/{errorName}")]
         public ActionResult GetErrorByName(string errorName)
         {
             var existedError = _errorRepository.GetErrorByName(errorName);

@@ -2,7 +2,7 @@ using BarMenu.Abstract;
 using BarMenu.Concrete;
 using BarMenu.Entities;
 using Microsoft.EntityFrameworkCore;
-
+using BarMenu;
 namespace BarMenu
 {
     public class Program
@@ -49,6 +49,23 @@ namespace BarMenu
 
             // CORS'u kullan
             app.UseCors("AllowSpecificOrigin");  // Burada sadece bir kez kullanýlmasý yeterli
+            
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var context = services.GetRequiredService<Context>();
+                    // JSON dosyasýnýn yolunu belirtin
+                    var jsonPath = Path.Combine(AppContext.BaseDirectory, "ErrorCodes.json");
+                    DataSeeder.SeedErrors(context, jsonPath);
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "Veritabaný tohumlama hatasý!");
+                }
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

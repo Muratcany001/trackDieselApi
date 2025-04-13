@@ -33,7 +33,7 @@ namespace trackDieselApi.Migrations
 
                     b.HasKey("Code");
 
-                    b.ToTable("Errors");
+                    b.ToTable("Errors", (string)null);
                 });
 
             modelBuilder.Entity("BarMenu.Entities.AppEntities.User", b =>
@@ -58,7 +58,7 @@ namespace trackDieselApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Car", b =>
@@ -83,7 +83,7 @@ namespace trackDieselApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cars");
+                    b.ToTable("Cars", (string)null);
                 });
 
             modelBuilder.Entity("Issue", b =>
@@ -121,7 +121,7 @@ namespace trackDieselApi.Migrations
 
                     b.HasIndex("CarId");
 
-                    b.ToTable("Issues");
+                    b.ToTable("Issues", (string)null);
                 });
 
             modelBuilder.Entity("Issue", b =>

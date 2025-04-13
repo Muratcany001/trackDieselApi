@@ -18,11 +18,8 @@ namespace BarMenu.Concrete
             var newError = new Error { Code = error.Code, Description = error.Description };
             _context.Errors.Add(newError);
             _context.SaveChanges();
-
             return newError;
         }
-
-
         public Error GetErrorByName(string errorName)
         {
             var existedError = _context.Errors.FirstOrDefault(x => x.Code == errorName);
