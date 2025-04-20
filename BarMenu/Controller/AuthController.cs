@@ -54,6 +54,7 @@ public class AuthController : ControllerBase
         var claims = new[]
         {
             new Claim(ClaimTypes.Name, user.Name),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Role, "User")
         };
 
@@ -62,8 +63,8 @@ public class AuthController : ControllerBase
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: "yourIssuer", // İssuer bilgisi
-            audience: "yourAudience", // Audience bilgisi
+            issuer: "your-issuer",
+            audience: "your-audience",
             claims: claims,
             expires: DateTime.Now.AddDays(1),
             signingCredentials: creds
@@ -72,4 +73,3 @@ public class AuthController : ControllerBase
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
-    

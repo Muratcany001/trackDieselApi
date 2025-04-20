@@ -3,6 +3,11 @@ using BarMenu.Concrete;
 using BarMenu.Entities;
 using Microsoft.EntityFrameworkCore;
 using BarMenu;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.OpenApi.Models;
+
 namespace BarMenu
 {
     public class Program
@@ -19,13 +24,31 @@ namespace BarMenu
             {
                 options.AddPolicy("AllowSpecificOrigin", builder =>
                 {
-                    builder.WithOrigins("http://localhost:4200") // Angular URL
+                    builder.WithOrigins("http://localhost:4200", "https://localhost:7029")
                            .AllowAnyMethod()
                            .AllowAnyHeader()
-                           .AllowCredentials();
+                           .AllowCredentials()
+                           .SetIsOriginAllowed(_ => true);
                 });
             });
 
+            // JWT Authentication ayarlarý
+            var key = Encoding.ASCII.GetBytes("your-256-bit-long-secret-key-that-you-need-to-ensure-is-256-bits-long");
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
@@ -34,7 +57,36 @@ namespace BarMenu
 
             // Add Swagger/OpenAPI configuration
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Track Diesel API", Version = "v1" });
+
+                // JWT Authentication için Swagger ayarlarý
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
+            });
 
             // Add DbContext
             builder.Services.AddDbContext<Context>(options =>
@@ -48,15 +100,14 @@ namespace BarMenu
             var app = builder.Build();
 
             // CORS'u kullan
-            app.UseCors("AllowSpecificOrigin");  // Burada sadece bir kez kullanýlmasý yeterli
-            
+            app.UseCors("AllowSpecificOrigin");
+
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
                 try
                 {
                     var context = services.GetRequiredService<Context>();
-                    // JSON dosyasýnýn yolunu belirtin
                     var jsonPath = Path.Combine(AppContext.BaseDirectory, "ErrorCodes.json");
                     DataSeeder.SeedErrors(context, jsonPath);
                 }
@@ -71,11 +122,20 @@ namespace BarMenu
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Track Diesel API V1");
+                    c.RoutePrefix = string.Empty;
+                    c.OAuthClientId("swagger-ui");
+                    c.OAuthAppName("Swagger UI");
+                });
             }
 
             // HTTPS redirection ve authorization kullanýmý
             app.UseHttpsRedirection();
+
+            // Authentication ve Authorization middleware'lerini doðru sýrayla ekle
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();

@@ -14,4 +14,5 @@ public class Car
     
     public List<Issue>? ErrorHistory { get; set; } = new List<Issue>();
     public DateTime? LastMaintenanceDate { get; set; }
+    public string UserId {  get; set; }
 }
