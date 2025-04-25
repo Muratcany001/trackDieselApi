@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
 
 [Route("api/auth")]
 [ApiController]
@@ -37,6 +38,20 @@ public class AuthController : ControllerBase
 
         return Ok(new { token });
     }
+    private static readonly HashSet<string> _blacklistedTokens = new HashSet<string>();
+    [HttpPost("logout")]
+    [Authorize] // Sadece giriş yapmış kullanıcılar çıkış yapabilir
+    public IActionResult Logout()
+    {
+        
+        var authHeader = HttpContext.Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer ")) {
+            return BadRequest("Geçersiz token");
+        }
+        var token = authHeader.Substring("Bearer ".Length).Trim();
+        _blacklistedTokens.Add(token);
+        return Ok(new { message = "Başarıyla çıkış yapıldı" });
+    }
 
     private string HashPasswordSHA256(string password)
     {
@@ -47,7 +62,6 @@ public class AuthController : ControllerBase
             return Convert.ToBase64String(hashBytes);
         }
     }
-
 
     private string GenerateJwtToken(User user)
     {
