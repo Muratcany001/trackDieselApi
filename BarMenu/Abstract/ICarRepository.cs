@@ -6,7 +6,7 @@ namespace BarMenu.Abstract
     {
         Car AddCar (Car car);
         Task<Car> UpdateCar (Car car);
-        Task<bool> DeleteCar (int id);
+        Task<bool> DeleteCar (string plate);
         Task<List<Car>> GetAllCars ();
         Task<Car> GetCarById (int id);
         Task<Car> GetCarByPlate (string plate);

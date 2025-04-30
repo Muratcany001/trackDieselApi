@@ -95,10 +95,10 @@ namespace BarMenu.Controller
             return Ok(existingCar);
         }
 
-        [HttpDelete("cars/DeleteCar/{id}")]
-        public async Task<ActionResult<Car>> DeleteCar(int id)
+        [HttpDelete("cars/DeleteCar/{plate}")]
+        public async Task<ActionResult<Car>> DeleteCar(string plate)
         {
-            var selectedCar = await _carRepository.GetCarById(id);
+            var selectedCar = await _carRepository.GetCarByPlate(plate);
             if (selectedCar == null)
             {
                 return NotFound("Araç bulunamadı");

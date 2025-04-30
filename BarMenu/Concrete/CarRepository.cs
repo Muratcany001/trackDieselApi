@@ -60,9 +60,9 @@ namespace BarMenu.Concrete
             await _context.SaveChangesAsync();
             return existingCar;
         }
-        public async Task<bool> DeleteCar(int id)
+        public async Task<bool> DeleteCar(string plate)
         {
-            var existedCar = _context.Cars.Include(x=> x.ErrorHistory).FirstOrDefault(x => x.Id == id);
+            var existedCar = _context.Cars.Include(x=> x.ErrorHistory).FirstOrDefault(x => x.Plate == plate);
             if (existedCar != null)
             {
                 _context.Cars.Remove(existedCar);
