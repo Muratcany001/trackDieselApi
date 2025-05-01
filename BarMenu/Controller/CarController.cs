@@ -71,28 +71,17 @@ namespace BarMenu.Controller
         }
 
         [HttpPatch("cars/UpdateCar/{plate}")]
-        public async Task<ActionResult<Car>> UpdateMenu(string plate, [FromBody] Car updateCar)
+        public async Task<IActionResult> UpdateCarIssues(string plate, [FromBody] List<Issue> updatedIssues)
         {
-            var existingCar = await _carRepository.GetCarByPlate(plate);
-            if (existingCar == null)
+            try
             {
-                return NotFound("Araç bulunamadı");
+                var car = await _carRepository.UpdateCar(plate, updatedIssues);
+                return Ok(car);
             }
-
-            // Kullanıcı kontrolü
-            if (existingCar.UserId != GetCurrentUserId())
+            catch (Exception ex)
             {
-                return Forbid("Bu aracı güncelleme yetkiniz yok");
+                return BadRequest(ex.Message);
             }
-
-            existingCar.Name = updateCar.Name ?? existingCar.Name;
-            existingCar.Plate = updateCar.Plate ?? existingCar.Plate;
-            existingCar.ErrorHistory = updateCar.ErrorHistory ?? existingCar.ErrorHistory;
-            existingCar.LastMaintenanceDate = updateCar.LastMaintenanceDate == default(DateTime) ? existingCar.LastMaintenanceDate : updateCar.LastMaintenanceDate;
-            existingCar.Age = updateCar.Age != 0 ? updateCar.Age : existingCar.Age;
-
-            _carRepository.UpdateCar(existingCar);
-            return Ok(existingCar);
         }
 
         [HttpDelete("cars/DeleteCar/{plate}")]
@@ -110,7 +99,7 @@ namespace BarMenu.Controller
                 return Forbid("Bu aracı silme yetkiniz yok");
             }
 
-            var isDeleted = await _carRepository.DeleteCar(id);
+            var isDeleted = await _carRepository.DeleteCar(plate);
             if (!isDeleted)
             {
                 return BadRequest("Araç silinmedi");
@@ -133,13 +122,36 @@ namespace BarMenu.Controller
         {
             var userId = GetCurrentUserId();
             var Issues = await _carRepository.GetAllIssues();
-            // Sadece kullanıcıya ait araçların sorunlarını filtrele
-            var userIssues = Issues.Where(i => i.Car?.UserId == userId).ToList();
-            if (userIssues == null || !userIssues.Any())
+            var userIssues = Issues.Where(i => i.Car.UserId == userId).ToList();
+            if (userIssues == null || !userIssues.Any())    
             {
                 return NotFound("Kayıtlı arıza parçası bulunamadı");
             }
             return Ok(userIssues);
+        }
+        [HttpGet("cars/GetModelsWithBrokenParts")]
+        public async Task<IActionResult> GetModelsWithBrokenParts()
+        {
+           var userId = GetCurrentUserId();
+           var models = await _carRepository.GetModelsWithBrokenParts();
+           var userModels = models.Where(i=> (string)i.UserId == userId).ToList();
+            if (userModels == null || !userModels.Any())
+            {
+                return NotFound("Araç kayıtları bulunamadı");
+            }
+            return Ok(userModels);
+        }
+        [HttpGet("cars/MostCommonProblems")]
+        public async Task<IActionResult> MostCommonProblems()
+        {
+            var userId = GetCurrentUserId();
+            var problems = await _carRepository.MostCommonProblems();
+            var userProblems = problems.Where(i=> (string)i.UserId == userId).ToList();
+            if(userProblems == null || !userProblems.Any())
+            {
+                return NotFound("Araç kayıtları bulunamadı");
+            }
+            return Ok(userProblems);
         }
     }
 }

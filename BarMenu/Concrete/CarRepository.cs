@@ -3,6 +3,7 @@ using BarMenu.Entities;
 using BarMenu.Entities.AppEntities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace BarMenu.Concrete
@@ -16,6 +17,11 @@ namespace BarMenu.Concrete
 
        public Car AddCar(Car car)
         {
+            var existingCar = _context.Cars.FirstOrDefault(c => c.Plate == car.Plate);
+            if (existingCar != null)
+            {
+                throw new Exception("Bu plaka sistemde zaten mevcut");
+            }
             foreach (var issue in car.ErrorHistory) {
                 issue.Car = null;
                 issue.CarId = 0;
@@ -30,8 +36,8 @@ namespace BarMenu.Concrete
         }
         public async Task<Car> GetCarById(int id)
         {
-            var menu = _context.Cars.Include(x => x.ErrorHistory).FirstOrDefaultAsync(m => m.Id == id);
-            return await menu;
+            var menu = await _context.Cars.Include(x => x.ErrorHistory).FirstOrDefaultAsync(m => m.Id == id);
+            return  menu;
 
         }
         public async Task<Car> GetCarWithIssuesAsync(int carId)
@@ -43,20 +49,50 @@ namespace BarMenu.Concrete
         }
         public async Task<List<Issue>> GetAllIssues()
         {
-                return await _context.Issues.ToListAsync();
-        }
-        public async Task<Car> UpdateCar(Car car)
+                    return await _context.Issues
+               .Select(i => new Issue
+               {
+                   Id = i.Id,
+                   Model = i.Model,
+                   EngineType = i.EngineType,
+                   PartName = i.PartName,
+                   Description = i.Description,
+                   DateReported = i.DateReported,
+                   IsReplaced = i.IsReplaced,
+                   CarId = i.CarId
+                            })
+                           .ToListAsync();
+         }
+        public async Task<Car> UpdateCar(string plate, List<Issue> updatedIssues)
         {
-            var existingCar = _context.Cars.Include(x => x.ErrorHistory).FirstOrDefault(m => m.Id == car.Id);
-            if (existingCar == null) {
+            var existingCar = await _context.Cars
+                .Include(c => c.ErrorHistory)
+                .FirstOrDefaultAsync(c => c.Plate == plate);
+
+            if (existingCar == null)
                 throw new Exception("Araç bulunamadı");
+            foreach (var updatedIssue in updatedIssues)
+            {
+                if (updatedIssue.Id == 0)
+                {
+                    updatedIssue.CarId = existingCar.Id;
+                    updatedIssue.DateReported = DateTime.Now;
+                    existingCar.ErrorHistory.Add(updatedIssue);
+                }
+                else
+                {
+                    var existingIssue = existingCar.ErrorHistory
+                        .FirstOrDefault(i => i.Id == updatedIssue.Id);
+
+                    if (existingIssue != null)
+                    {
+                        existingIssue.PartName = updatedIssue.PartName ?? existingIssue.PartName;
+                        existingIssue.Description = updatedIssue.Description ?? existingIssue.Description;
+                        existingIssue.IsReplaced = updatedIssue.IsReplaced;
+                    }
+                }
             }
-            existingCar.Id = car.Id;
-            existingCar.Name = car.Name;
-            existingCar.ErrorHistory = car.ErrorHistory;
-            existingCar.LastMaintenanceDate = car.LastMaintenanceDate;
-            existingCar.Plate = car.Plate;
-            _context.Cars.Update(existingCar);
+
             await _context.SaveChangesAsync();
             return existingCar;
         }
@@ -87,6 +123,44 @@ namespace BarMenu.Concrete
             }
             return existedCar;
         }
-
+        public async Task<List<dynamic>> GetModelsWithBrokenParts()
+        {
+            return await _context.Issues
+                .Include(i => i.Car)
+                .GroupBy(i => new {
+                    i.Model,
+                    i.EngineType,
+                    i.PartName,
+                    UserId = i.Car.UserId
+                })
+                .Select(g => new
+                {
+                    g.Key.Model,
+                    g.Key.EngineType,
+                    g.Key.PartName,
+                    Count = g.Count(),
+                    g.Key.UserId
+                })
+                .Cast<dynamic>()
+                .ToListAsync<dynamic>();
+        }
+        public async Task<List<dynamic>> MostCommonProblems()
+        {
+            return await _context.Issues
+                .Include (i => i.Car)
+                .GroupBy (i => new
+                {
+                    i.Description,
+                    UserId = i.Car.UserId
+                })
+                .Select(g => new
+                {
+                    g.Key.Description,
+                    g.Key.UserId,
+                    Count = g.Count(),
+                })
+                .Cast<dynamic>()
+                .ToListAsync<dynamic>();
+        }
     }
 }
