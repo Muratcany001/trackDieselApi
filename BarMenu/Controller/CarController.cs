@@ -7,7 +7,7 @@ using System.Security.Claims;
 namespace BarMenu.Controller
 {
     [ApiController]
-    [Authorize] // Tüm endpoint'ler için yetkilendirme gerekli
+    [Authorize] 
     public class CarController : ControllerBase
     {
         private readonly ICarRepository _carRepository;
@@ -28,8 +28,10 @@ namespace BarMenu.Controller
             {
                 return BadRequest("Lütfen araç bilgilerini doldur...");
             }
-
-            // Kullanıcı ID'sini otomatik olarak set et
+            var existingCar = _carRepository.GetCarByPlate(car.Plate);
+            if (existingCar == null) { 
+                return BadRequest("Plaka sistemde mevcut");
+            }
             car.UserId = GetCurrentUserId();
 
             foreach (var issue in car.ErrorHistory)
@@ -47,7 +49,6 @@ namespace BarMenu.Controller
         {
             var userId = GetCurrentUserId();
             var cars = await _carRepository.GetAllCars();
-            // Sadece kullanıcıya ait araçları filtrele
             var userCars = cars.Where(c => c.UserId == userId).ToList();
             return Ok(userCars);
         }
@@ -60,8 +61,6 @@ namespace BarMenu.Controller
             {
                 return NotFound("Araç bulunamadı");
             }
-
-            // Kullanıcı kontrolü
             if (car.UserId != GetCurrentUserId())
             {
                 return Forbid("Bu araca erişim yetkiniz yok");
@@ -74,7 +73,7 @@ namespace BarMenu.Controller
         public async Task<IActionResult> UpdateCarIssues(string plate, [FromBody] List<Issue> updatedIssues)
         {
             try
-            {
+            { 
                 var car = await _carRepository.UpdateCar(plate, updatedIssues);
                 return Ok(car);
             }
@@ -92,8 +91,6 @@ namespace BarMenu.Controller
             {
                 return NotFound("Araç bulunamadı");
             }
-
-            // Kullanıcı kontrolü
             if (selectedCar.UserId != GetCurrentUserId())
             {
                 return Forbid("Bu aracı silme yetkiniz yok");
@@ -112,7 +109,6 @@ namespace BarMenu.Controller
         {
             var userId = GetCurrentUserId();
             var cars = await _carRepository.GetAllCars();
-            // Sadece kullanıcıya ait araçların sayısını döndür
             var userCarCount = cars.Count(c => c.UserId == userId);
             return Ok(userCarCount);
         }

@@ -17,11 +17,6 @@ namespace BarMenu.Concrete
 
        public Car AddCar(Car car)
         {
-            var existingCar = _context.Cars.FirstOrDefault(c => c.Plate == car.Plate);
-            if (existingCar != null)
-            {
-                throw new Exception("Bu plaka sistemde zaten mevcut");
-            }
             foreach (var issue in car.ErrorHistory) {
                 issue.Car = null;
                 issue.CarId = 0;
@@ -118,9 +113,7 @@ namespace BarMenu.Concrete
         public async Task<Car> GetCarByPlate(string plate)
         {
             var existedCar = await _context.Cars.Include(x=> x.ErrorHistory).FirstOrDefaultAsync(x => x.Plate == plate);
-            if (existedCar == null) {
-                throw new Exception("Belirtilen plakaya ait araç bulunamadı");
-            }
+            
             return existedCar;
         }
         public async Task<List<dynamic>> GetModelsWithBrokenParts()
@@ -141,7 +134,7 @@ namespace BarMenu.Concrete
                     Count = g.Count(),
                     g.Key.UserId
                 })
-                .Cast<dynamic>()
+                .OrderByDescending(x => x.Count)
                 .ToListAsync<dynamic>();
         }
         public async Task<List<dynamic>> MostCommonProblems()
@@ -159,7 +152,7 @@ namespace BarMenu.Concrete
                     g.Key.UserId,
                     Count = g.Count(),
                 })
-                .Cast<dynamic>()
+                .OrderByDescending(x=> x.Count)
                 .ToListAsync<dynamic>();
         }
     }
