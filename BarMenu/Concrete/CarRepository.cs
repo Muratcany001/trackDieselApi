@@ -124,6 +124,7 @@ namespace BarMenu.Concrete
                     i.Model,
                     i.EngineType,
                     i.PartName,
+                    i.DateReported,
                     UserId = i.Car.UserId
                 })
                 .Select(g => new
@@ -131,6 +132,7 @@ namespace BarMenu.Concrete
                     g.Key.Model,
                     g.Key.EngineType,
                     g.Key.PartName,
+                    g.Key.DateReported,
                     Count = g.Count(),
                     g.Key.UserId
                 })
@@ -144,11 +146,13 @@ namespace BarMenu.Concrete
                 .GroupBy (i => new
                 {
                     i.Description,
+                    i.DateReported,
                     UserId = i.Car.UserId
                 })
                 .Select(g => new
                 {
                     g.Key.Description,
+                    g.Key.DateReported,
                     g.Key.UserId,
                     Count = g.Count(),
                 })
