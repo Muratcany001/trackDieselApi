@@ -4,7 +4,7 @@ namespace BarMenu.Abstract
 {
     public interface ICarRepository
     {
-        Car AddCar (Car car);
+        Task<Car> AddCar (Car car);
         Task<bool> DeleteCar (string plate);
         Task<List<Car>> GetAllCars ();
         Task<Car> GetCarById (int id);

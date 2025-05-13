@@ -22,7 +22,7 @@ namespace BarMenu.Controller
         }
 
         [HttpPost("cars/AddCar")]
-        public IActionResult AddCar(Car car)
+        public async Task<ActionResult<Car>> AddCar(Car car)
         {
             if (car == null)
             {
@@ -40,7 +40,7 @@ namespace BarMenu.Controller
                 issue.Car = null;
             }
 
-            var AddCar = _carRepository.AddCar(car);
+            var AddCar = await _carRepository.AddCar(car);
             return Ok(AddCar);
         }
 

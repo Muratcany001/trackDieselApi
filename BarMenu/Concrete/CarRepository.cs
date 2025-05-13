@@ -15,14 +15,14 @@ namespace BarMenu.Concrete
         _context = context;
         }
 
-       public Car AddCar(Car car)
+       public async Task<Car> AddCar(Car car)
         {
             foreach (var issue in car.ErrorHistory) {
                 issue.Car = null;
                 issue.CarId = 0;
             }
             _context.Cars.Add(car);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return car;
         }
         public async Task<List<Car>> GetAllCars()
