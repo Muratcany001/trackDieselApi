@@ -96,6 +96,7 @@ namespace BarMenu
             builder.Services.AddScoped<ICarRepository, CarRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IErrorRepository, ErrorRepository>();
+            builder.Services.AddScoped<IPartRepository, PartRepository>();
 
             var app = builder.Build();
 

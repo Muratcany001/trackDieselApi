@@ -1,0 +1,54 @@
+﻿using BarMenu.Abstract;
+using BarMenu.Entities;
+using BarMenu.Entities.AppEntities;
+using Microsoft.EntityFrameworkCore;
+
+namespace BarMenu.Concrete
+{
+    public class PartRepository : IPartRepository
+    {
+        public readonly Context _context;
+        public PartRepository(Context context)
+        {
+            _context = context;
+        }
+
+        public async Task<Part> AddPartAsync(Part part)
+        {
+            _context.Parts.Add(part);
+            await _context.SaveChangesAsync();
+            return part;
+        }
+
+        public async Task<Part> DeletePartAsync(int id)
+        {
+            var existedPart =await _context.Parts.FirstOrDefaultAsync(x => x.Id == id);
+            _context.Parts.Remove(existedPart);
+            await _context.SaveChangesAsync();
+            return existedPart;
+        }
+
+        public async Task<List<Part>> GetAllPartsAsync(string userId)
+        {
+            return await _context.Parts.Where(c=> c.UserId == userId).ToListAsync();
+        }
+        public async Task<Part> GetPartByIdAsync(int id)
+        {
+            var existedPart = await _context.Parts.FindAsync(id);
+            return existedPart;
+        }
+
+        public async Task<Part> UpdatePartAsync(Part part)
+        {
+            var existedPart =await _context.Parts.FirstOrDefaultAsync(x => x.Id == part.Id);
+            
+            existedPart.Name = part.Name;
+            existedPart.Description = part.Description;
+            existedPart.count = part.count;
+            existedPart.State = part.State;
+            _context.Update(existedPart);
+            _context.SaveChangesAsync();
+            return existedPart;
+        }
+    }
+}

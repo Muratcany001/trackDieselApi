@@ -12,6 +12,7 @@ namespace BarMenu.Entities
         public DbSet<Car> Cars { get; set; }
         public DbSet<Issue> Issues { get; set; }
         public DbSet<Error> Errors { get; set; }
+        public DbSet<Part> Parts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

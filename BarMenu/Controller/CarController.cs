@@ -63,7 +63,7 @@ namespace BarMenu.Controller
             }
             if (car.UserId != GetCurrentUserId())
             {
-                return Forbid("Bu araca erişim yetkiniz yok");
+                return Forbid("Araç bulunamadı");
             }
 
             return Ok(car);
