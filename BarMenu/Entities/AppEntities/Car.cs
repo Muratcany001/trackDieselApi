@@ -11,8 +11,12 @@ public class Car
     public string? Name { get; set; }
     public int? Age { get; set; }
     public string? Plate { get; set; }
-    
     public List<Issue>? ErrorHistory { get; set; } = new List<Issue>();
     public DateTime? LastMaintenanceDate { get; set; }
+    public ICollection<CarPart> CarParts { get; set; } = new List<CarPart>();
+
+    [NotMapped]
+    public ICollection<Part> Parts => CarParts.Select(cp => cp.Part).ToList();
     public string UserId {  get; set; }
+
 }

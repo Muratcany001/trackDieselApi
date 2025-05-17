@@ -39,8 +39,18 @@ namespace BarMenu.Controller
                 issue.Id = 0;
                 issue.Car = null;
             }
+            if (car.CarParts != null)
+            {
+                foreach (var cp in car.CarParts)
+                {
+                    cp.Id = 0;
+                    cp.Car = null;
+                    cp.CarId = 0;
+                    // cp.Part ve cp.PartId: Part nesnesi zaten ignore ediliyor, PartId frontend’den gelsin
+                }
+            }
 
-            var AddCar = await _carRepository.AddCar(car);
+                var AddCar = await _carRepository.AddCar(car);
             return Ok(AddCar);
         }
 
@@ -73,7 +83,7 @@ namespace BarMenu.Controller
         public async Task<IActionResult> UpdateCarIssues(string plate, [FromBody] List<Issue> updatedIssues)
         {
             try
-            { 
+            {
                 var car = await _carRepository.UpdateCar(plate, updatedIssues);
                 return Ok(car);
             }
@@ -82,6 +92,7 @@ namespace BarMenu.Controller
                 return BadRequest(ex.Message);
             }
         }
+
 
         [HttpDelete("cars/DeleteCar/{plate}")]
         public async Task<ActionResult<Car>> DeleteCar(string plate)

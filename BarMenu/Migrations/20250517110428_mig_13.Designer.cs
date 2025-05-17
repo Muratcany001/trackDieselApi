@@ -4,6 +4,7 @@ using BarMenu.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace trackDieselApi.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20250517110428_mig_13")]
+    partial class mig_13
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,32 @@ namespace trackDieselApi.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("BarMenu.Entities.AppEntities.CarPart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CarId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PartId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsedCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarId");
+
+                    b.HasIndex("PartId");
+
+                    b.ToTable("CarParts");
+                });
 
             modelBuilder.Entity("BarMenu.Entities.AppEntities.Error", b =>
                 {
@@ -122,32 +151,6 @@ namespace trackDieselApi.Migrations
                     b.ToTable("Cars");
                 });
 
-            modelBuilder.Entity("CarPart", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CarId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PartId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsedCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CarId");
-
-                    b.HasIndex("PartId");
-
-                    b.ToTable("CarParts");
-                });
-
             modelBuilder.Entity("Issue", b =>
                 {
                     b.Property<int>("Id")
@@ -157,9 +160,6 @@ namespace trackDieselApi.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CarId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Count")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DateReported")
@@ -178,9 +178,6 @@ namespace trackDieselApi.Migrations
                     b.Property<string>("Model")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PartId")
-                        .HasColumnType("int");
-
                     b.Property<string>("PartName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -192,7 +189,7 @@ namespace trackDieselApi.Migrations
                     b.ToTable("Issues");
                 });
 
-            modelBuilder.Entity("CarPart", b =>
+            modelBuilder.Entity("BarMenu.Entities.AppEntities.CarPart", b =>
                 {
                     b.HasOne("Car", "Car")
                         .WithMany("CarParts")

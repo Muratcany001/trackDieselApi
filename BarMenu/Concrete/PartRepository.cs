@@ -37,7 +37,16 @@ namespace BarMenu.Concrete
             var existedPart = await _context.Parts.FindAsync(id);
             return existedPart;
         }
-
+        public async Task<Part> GetPartByName(string name)
+        {
+            return await _context.Parts
+                .FirstOrDefaultAsync(p => EF.Functions.Like(p.Name, name));
+        }
+        public async Task AddBulkPart(List<Part> parts)
+        {
+            await _context.Parts.AddRangeAsync(parts);
+            await _context.SaveChangesAsync();
+        }
         public async Task<Part> UpdatePartAsync(Part part)
         {
             var existedPart =await _context.Parts.FirstOrDefaultAsync(x => x.Id == part.Id);

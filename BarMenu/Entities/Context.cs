@@ -13,6 +13,7 @@ namespace BarMenu.Entities
         public DbSet<Issue> Issues { get; set; }
         public DbSet<Error> Errors { get; set; }
         public DbSet<Part> Parts { get; set; }
+        public DbSet<CarPart> CarParts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -21,6 +22,16 @@ namespace BarMenu.Entities
                 .HasMany(c => c.ErrorHistory)
                 .WithOne(i => i.Car)
                 .HasForeignKey(i => i.CarId);
+
+            modelBuilder.Entity<CarPart>()
+        .HasOne(cp => cp.Car)
+        .WithMany(c => c.CarParts)
+        .HasForeignKey(cp => cp.CarId);
+
+            modelBuilder.Entity<CarPart>()
+                .HasOne(cp => cp.Part)
+                .WithMany(p => p.CarParts)
+                .HasForeignKey(cp => cp.PartId);
         }
     }
 }

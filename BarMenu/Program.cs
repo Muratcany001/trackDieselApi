@@ -115,7 +115,7 @@ namespace BarMenu
                 catch (Exception ex)
                 {
                     var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "Veritabaný tohumlama hatasý!");
+                    logger.LogError(ex, "Veritabaný seed hatasý!");
                 }
             }
 

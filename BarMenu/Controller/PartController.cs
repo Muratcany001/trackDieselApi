@@ -7,6 +7,7 @@ using System.Security.Claims;
 namespace BarMenu.Controller
 {
     [ApiController]
+    [Authorize]
     public class PartController : ControllerBase
     {
 
@@ -31,7 +32,19 @@ namespace BarMenu.Controller
             await _partRepository.AddPartAsync(part);
             return CreatedAtAction(nameof(GetPartById), new { id= part.Id},part);
         }
-
+        [HttpGet("parts/GetPartByName/{name}")]
+        public async Task<ActionResult<Part>> GetPartByName(string name)
+        {
+            if (name == null)
+            {
+                return BadRequest("Geçerli ad giriniz");
+            }
+            var existedPart = await _partRepository.GetPartByName(name);
+            if (existedPart == null) {
+                return BadRequest("Araç bulunamadı");
+            }
+            return Ok(existedPart);
+        }
 
 
         [HttpGet("parts/GetAllParts/")]
@@ -77,7 +90,34 @@ namespace BarMenu.Controller
             await _partRepository.DeletePartAsync(id);
             return NoContent();
         }
-        
+        [HttpPost("parts/AddBulkParts")]
+        public async Task<IActionResult> AddBulkParts([FromBody] List<Part> parts)
+        {
+            if (parts == null || !parts.Any())
+            {
+                return BadRequest("En az bir parça bilgisi gereklidir.");
+            }
+
+            var userId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Kullanıcı bilgisi alınamadı.");
+            }
+
+            // Tüm parçalara userId ataması yap
+            parts.ForEach(p => p.UserId = userId);
+
+            try
+            {
+                await _partRepository.AddBulkPart(parts);
+                return Ok($"{parts.Count} adet parça başarıyla eklendi.");
+            }
+            catch (Exception ex)
+            {
+                // Hata detayını loglayabilirsiniz
+                return StatusCode(500, $"Toplu parça ekleme sırasında hata oluştu: {ex.Message}");
+            }
+        }
 
     } 
 }

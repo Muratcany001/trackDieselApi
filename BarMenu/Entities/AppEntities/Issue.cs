@@ -18,4 +18,6 @@ public class Issue
     public int CarId { get; set; }
     [JsonIgnore]
     public Car? Car { get; set; }
+    public int PartId { get; set; }
+    public int Count { get; set; } = 1;
 }
