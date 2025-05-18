@@ -64,8 +64,8 @@ namespace BarMenu.Controller
             }
             return Ok(existedParts);
         }
-        [HttpPatch("parts/UpdatePart/{id}")]
-        public async Task<ActionResult<Part>> UpdatePart(int id, [FromBody] Part updatedPart)
+        [HttpPatch("parts/UpdateStockAsync/{id}")]
+        public async Task<ActionResult<Part>> UpdateStockAsync(int id, [FromBody] Part updatedPart)
         {
             var userId = GetCurrentUserId();
             var existedPart = await _partRepository.GetPartByIdAsync(id);
@@ -75,7 +75,7 @@ namespace BarMenu.Controller
             }
             updatedPart.Id = id;
             updatedPart.UserId = userId;
-            var result = await _partRepository.UpdatePartAsync(updatedPart);
+            var result = await _partRepository.UpdateStockAsync(updatedPart);
             return Ok(result);
         }
         [HttpDelete("parts/DeletePart/{id}")]

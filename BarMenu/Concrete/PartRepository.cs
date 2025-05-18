@@ -47,16 +47,12 @@ namespace BarMenu.Concrete
             await _context.Parts.AddRangeAsync(parts);
             await _context.SaveChangesAsync();
         }
-        public async Task<Part> UpdatePartAsync(Part part)
+        public async Task<Part> UpdateStockAsync(Part part)
         {
             var existedPart =await _context.Parts.FirstOrDefaultAsync(x => x.Id == part.Id);
-            
-            existedPart.Name = part.Name;
-            existedPart.Description = part.Description;
             existedPart.count = part.count;
-            existedPart.State = part.State;
-            _context.Update(existedPart);
-            _context.SaveChangesAsync();
+            _context.Update(existedPart);   
+            await _context.SaveChangesAsync();
             return existedPart;
         }
     }
