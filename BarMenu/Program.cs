@@ -22,13 +22,18 @@ namespace BarMenu
             // CORS ayarlarý
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowSpecificOrigin", builder =>
+                options.AddPolicy("AllowAllForMobile", builder =>
                 {
-                    builder.WithOrigins("http://localhost:4200", "https://localhost:7029")
-                           .AllowAnyMethod()
-                           .AllowAnyHeader()
-                           .AllowCredentials()
-                           .SetIsOriginAllowed(_ => true);
+                    builder
+                        .WithOrigins(
+                            "http://localhost",       // Ionic dev sunucusu
+                            "http://localhost:8100", // Ionic standart port
+                            "capacitor://localhost", // Android için
+                            "https://your-api.com"   // Production API URL
+                        )
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
                 });
             });
 
@@ -134,11 +139,15 @@ namespace BarMenu
 
             // HTTPS redirection ve authorization kullanýmý
             app.UseHttpsRedirection();
+            if (app.Environment.IsProduction())
+            {
+                app.UseHttpsRedirection();
+            }
 
             // Authentication ve Authorization middleware'lerini doðru sýrayla ekle
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseCors("AllowAllForMobile");
             app.MapControllers();
 
             app.Run();

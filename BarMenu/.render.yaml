@@ -1,0 +1,7 @@
+﻿services:
+  - type: web
+    name: bar-menu-api
+    env: dotnet
+    rootDir: BarMenu
+    buildCommand: dotnet build BarMenu.csproj
+    startCommand: dotnet run --project BarMenu.csproj
