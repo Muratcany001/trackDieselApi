@@ -2,6 +2,14 @@
   - type: web
     name: bar-menu-api
     env: dotnet
-    rootDir: BarMenu
-    buildCommand: dotnet build BarMenu.csproj
-    startCommand: dotnet run --project BarMenu.csproj
+    rootDir: ./BarMenu
+    buildCommand: dotnet restore && dotnet build BarMenu.csproj -c Release
+    startCommand: dotnet BarMenu.dll
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:10000
+    # Eğer database connection string'iniz varsa environment variable olarak ekleyin
+    # - key: ConnectionStrings__DefaultConnection
+    #   value: your-production-connection-string
