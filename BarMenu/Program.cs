@@ -22,17 +22,18 @@ namespace BarMenu
             // CORS ayarlarý
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAllForMobile", builder =>
+                options.AddPolicy("AllowFrontend", policy =>
                 {
-                    builder
+                    policy
                         .WithOrigins(
-                            "http://localhost",       // Ionic dev sunucusu
-                            "http://localhost:8100", // Ionic standart port
-                            "capacitor://localhost", // Android için
-                            "https://your-api.com"   // Production API URL
+                            "http://localhost",
+                            "http://localhost:8100",
+                            "capacitor://localhost",
+                            "http://localhost:4200",
+                            "https://track-diesel-gjagw81k9-muratcany001s-projects.vercel.app"
                         )
-                        .AllowAnyMethod()
                         .AllowAnyHeader()
+                        .AllowAnyMethod()
                         .AllowCredentials();
                 });
             });
@@ -95,7 +96,7 @@ namespace BarMenu
 
             // Add DbContext
             builder.Services.AddDbContext<Context>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Add scoped services
             builder.Services.AddScoped<ICarRepository, CarRepository>();

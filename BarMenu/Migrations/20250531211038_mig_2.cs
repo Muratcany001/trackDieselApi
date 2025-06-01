@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace trackDieselApi.Migrations
+namespace BarMenu.Migrations
 {
     /// <inheritdoc />
     public partial class mig_2 : Migration
