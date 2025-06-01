@@ -107,7 +107,6 @@ namespace BarMenu
             var app = builder.Build();
 
             // CORS'u kullan
-            app.UseCors("AllowSpecificOrigin");
 
             using (var scope = app.Services.CreateScope())
             {
@@ -147,8 +146,8 @@ namespace BarMenu
 
             // Authentication ve Authorization middleware'lerini doðru sýrayla ekle
             app.UseAuthentication();
+            app.UseCors("AllowFrontend");
             app.UseAuthorization();
-            app.UseCors("AllowAllForMobile");
             app.MapControllers();
 
             app.Run();
