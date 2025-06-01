@@ -19,7 +19,6 @@ namespace BarMenu
             // Add services to the container.
             builder.Services.AddControllers();
 
-            // CORS ayarlarý
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", policy =>
@@ -27,10 +26,13 @@ namespace BarMenu
                     policy
                         .WithOrigins(
                             "http://localhost",
+                            "http://localhost:4200",
+                            "http://127.0.0.1:4200",
+                            "https://localhost:4200",
                             "http://localhost:8100",
                             "capacitor://localhost",
-                            "http://localhost:4200",
-                            "https://track-diesel-gjagw81k9-muratcany001s-projects.vercel.app"
+                            "https://track-diesel-gjagw81k9-muratcany001s-projects.vercel.app",
+                            "https://track-diesel-ui.vercel.app"
                         )
                         .AllowAnyHeader()
                         .AllowAnyMethod()
@@ -106,8 +108,7 @@ namespace BarMenu
 
             var app = builder.Build();
 
-            // CORS'u kullan
-
+            // Data seeding
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -137,17 +138,17 @@ namespace BarMenu
                 });
             }
 
-            // HTTPS redirection ve authorization kullanýmý
-            app.UseHttpsRedirection();
+            // HTTPS redirection - sadece production'da
             if (app.Environment.IsProduction())
             {
                 app.UseHttpsRedirection();
             }
 
-            // Authentication ve Authorization middleware'lerini doðru sýrayla ekle
-            app.UseAuthentication();
-            app.UseCors("AllowFrontend");
-            app.UseAuthorization();
+            // Middleware sýrasý çok önemli!
+            app.UseCors("AllowFrontend");  // CORS en baþta olmalý
+            app.UseAuthentication();       // Authentication, Authorization'dan önce
+            app.UseAuthorization();        // Authorization, MapControllers'dan önce
+
             app.MapControllers();
 
             app.Run();
