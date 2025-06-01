@@ -25,14 +25,14 @@ namespace BarMenu
                 {
                     policy
                         .WithOrigins(
-                            "http://localhost",
-                            "http://localhost:4200",
-                            "http://127.0.0.1:4200",
+                            "https://localhost",
                             "https://localhost:4200",
-                            "http://localhost:8100",
-                            "capacitor://localhost",
+                            "https://127.0.0.1:4200",
+                            "https://localhost:4200",
+                            "https://localhost:8100",
                             "https://track-diesel-gjagw81k9-muratcany001s-projects.vercel.app",
-                            "https://track-diesel-ui.vercel.app"
+                            "https://track-diesel-ui.vercel.app",
+                            "https://trackdieselapi.onrender.com"
                         )
                         .AllowAnyHeader()
                         .AllowAnyMethod()
